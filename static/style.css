@@ -1,0 +1,223 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    color: #333;
+}
+
+/* Header */
+header {
+    background: #004080;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Smooth fade-in animation */
+section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-in, transform 0.5s ease-in;
+}
+
+/* Activate animation */
+section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mp-info img {
+    width: 80px;
+    border-radius: 50%;
+}
+
+nav button {
+    background: #FFD700;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+/* Main Sections */
+main {
+    padding: 20px;
+}
+
+section {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Voter Summary */
+.widget {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    font-size: 1.2em;
+}
+
+/* Interactive Map */
+#map-container {
+    height: 400px;
+    background: #ddd;
+    border-radius: 5px;
+}
+
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+canvas {
+    max-width: 400px;
+    max-height: 400px;
+}
+
+
+#tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 3px;
+    display: none;
+}
+
+nav button:hover {
+    background: #FFA500;
+    transform: scale(1.05);
+    transition: 0.3s ease-in-out;
+}
+
+#statsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#statsTable th {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+#statsTable td {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+#statsTable tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#statsTable tr:hover {
+  background-color: #eef5ff;
+}
+
+.stats-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.stats-table th, .stats-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.voter-boxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.voter-card {
+  background-color: #ffffff;
+  border-left: 6px solid #007bff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 250px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.voter-card:hover {
+  transform: translateY(-5px);
+}
+
+.voter-card h3 {
+  margin-top: 0;
+  color: #007bff;
+}
+
+.voter-card p {
+  margin: 6px 0;
+}
+
+select#dunSelector {
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+  }
+
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  width: 80%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #888;
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: #000;
+}
+
+.popup-nav-btn {
+    background-color: #f1f5f9;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .popup-nav-btn:hover {
+    background-color: #e2e8f0;
+    border-color: #94a3b8;
+  }
+
