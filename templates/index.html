@@ -1,111 +1,801 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Parlimen Kubang Pasu Dashboard</title>
-  <link rel="stylesheet" href="/static/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  
-</head>
-<body>
-  <header>
-    <h1>Parlimen Kubang Pasu (P.006)</h1>
-    <div class="mp-info">
-      <p><strong><span id="mpName">Loading MP...</span></strong> (<span id="mpParty">...</span>)</p>
-      <p>Last Updated: <span id="lastUpdated">--</span></p>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Parlimen Kubang Pasu Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        --hover-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--primary-gradient);
+        min-height: 100vh;
+        color: #2c3e50;
+        line-height: 1.6;
+      }
+
+      header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border-bottom: 3px solid transparent;
+        border-image: var(--primary-gradient) 1;
+      }
+
+      header h1 {
+        color: #2c3e50;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .mp-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 20px;
+        margin: 1.5rem auto;
+        max-width: 600px;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .mp-info p {
+        margin: 0.8rem 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+
+      main {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        background: var(--primary-gradient);
+        padding: 4rem 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+      }
+
+      .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      .constituency-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        backdrop-filter: blur(10px);
+      }
+
+      .hero-section h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 2rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .mp-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 500px;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .mp-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .mp-details {
+        text-align: left;
+        flex: 1;
+      }
+
+      .mp-details h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .party-badge {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 0.3rem 1rem;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+
+      .profile-btn {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .profile-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+      
+      .analysis-btn {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      
+      .analysis-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .last-updated {
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+
+      /* Dashboard Layout */
+      .dashboard-container {
+        max-width: 1400px;
+        margin: -2rem auto 0;
+        padding: 0 2rem 2rem;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      .dashboard-left, .dashboard-right {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+      }
+
+      .stat-icon {
+        font-size: 2.5rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-gradient);
+        border-radius: 15px;
+        flex-shrink: 0;
+      }
+
+      .stat-content h4 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+      }
+
+      .stat-content p {
+        margin: 0.3rem 0;
+        color: #6c757d;
+      }
+
+      /* Section Styles */
+      .results-section, .demographics-section, .map-section, .table-section {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        padding: 2.5rem;
+        border-radius: 25px;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+      }
+
+      .results-section:hover, .demographics-section:hover, 
+      .map-section:hover, .table-section:hover {
+        box-shadow: var(--hover-shadow);
+        transform: translateY(-3px);
+      }
+
+      .results-section h2, .demographics-section h2, 
+      .map-section h2, .table-section h2 {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Election Tabs */
+      .election-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .tab-btn {
+        background: #f8f9fa;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .tab-btn.active {
+        background: var(--primary-gradient);
+        color: white;
+      }
+
+      .tab-btn:hover:not(.active) {
+        background: #e9ecef;
+      }
+
+      .election-content {
+        position: relative;
+        min-height: 400px;
+      }
+
+      .election-chart {
+        display: none;
+        text-align: center;
+      }
+
+      .election-chart.active {
+        display: block;
+      }
+
+      /* Demographics Grid */
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+      }
+
+      .demo-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+      }
+
+      .demo-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .demo-card h4 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      #statsTableContainer {
+        overflow-x: auto;
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+      }
+
+      #statsTable {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: inherit;
+        margin: 0;
+        background: white;
+      }
+
+      #statsTable th {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-align: center;
+      }
+
+      #statsTable td {
+        border: 1px solid #e9ecef;
+        padding: 1.2rem;
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      #statsTable tbody tr:nth-child(even) {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      }
+
+      #statsTable tbody tr:hover {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        transform: scale(1.01);
+        transition: all 0.3s ease;
+      }
+
+      #map-container {
+        height: 500px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: 3px solid rgba(102, 126, 234, 0.2);
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: var(--secondary-gradient);
+      }
+
+      .modal-content {
+        border-radius: 25px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .modal-header {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 2rem;
+        border: none;
+      }
+
+      .modal-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      .modal-body {
+        padding: 2.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      }
+
+      @media (max-width: 1024px) {
+        .dashboard-container {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .hero-section h1 {
+          font-size: 2.8rem;
+        }
+
+        .mp-card {
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .mp-details {
+          text-align: center;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .hero-section {
+          padding: 3rem 1rem;
+        }
+
+        .hero-section h1 {
+          font-size: 2.2rem;
+        }
+
+        .dashboard-container {
+          padding: 0 1rem 2rem;
+          margin-top: -1rem;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .demo-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .election-tabs {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .results-section, .demographics-section, 
+        .map-section, .table-section {
+          padding: 2rem 1.5rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-section {
+          padding: 2rem 1rem;
+        }
+
+        .hero-section h1 {
+          font-size: 1.8rem;
+        }
+
+        .mp-card {
+          padding: 1.5rem;
+          margin: 1.5rem auto;
+        }
+
+        .stat-card {
+          padding: 1.5rem;
+          flex-direction: column;
+          text-align: center;
+        }
+
+        .stat-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 2rem;
+        }
+      }
+
+      /* Loading animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      section {
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--secondary-gradient);
+      }
+      
+      /* Prevent overlays from blocking clicks */
+      .loading-overlay,
+      .spinner-overlay,
+      #loadingOverlay {
+        pointer-events: none !important;
+      }
+
+      /* Ensure MP profile button is always clickable */
+      #mpProfileBtn {
+        position: relative;
+        z-index: 9999;
+        pointer-events: auto;
+      }
+    </style>
+
+  </head>
+  <body>
+    <!-- Hero Section with MP Info -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <div class="constituency-badge">P.006</div>
+        <h1>Parlimen Kubang Pasu</h1>
+        <div class="mp-card">
+          <div class="mp-avatar">
+            <span id="mpInitials">MP</span>
+          </div>
+          <div class="mp-details">
+            <h3><span id="mpName">Loading MP...</span></h3>
+            <p class="party-badge"><span id="mpParty">...</span></p>
+            <button id="mpProfileBtn" class="profile-btn" data-bs-toggle="modal" data-bs-target="#mpProfileModal">
+              View MP Profile
+            </button>
+            <button id="btnAnalysis" class="analysis-btn" data-bs-toggle="modal" data-bs-target="#mpAnalysisModal">
+              Analysis MP Profile
+            </button>
+          </div>
+        </div>
+        <div class="last-updated">
+          Last Updated: <span id="lastUpdated">--</span>
+        </div>
+      </div>
     </div>
-    
-    <!-- MP Profile Button -->
-    <div style="text-align: center; margin-top: 10px;">
-      <button id="mpProfileBtn" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#mpProfileModal">MP Profile</button>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-container">
+      <!-- Left Column -->
+      <div class="dashboard-left">
+        <!-- Quick Stats Cards -->
+        <div class="stats-grid">
+          <div class="stat-card ge14-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+              <h4>GE14</h4>
+              <p><strong>Voters:</strong> <span id="registeredVoters14"></span></p>
+              <p><strong>Turnout:</strong> <span id="voterTurnout14"></span></p>
+            </div>
+          </div>
+          <div class="stat-card ge15-card">
+            <div class="stat-icon">🗳️</div>
+            <div class="stat-content">
+              <h4>GE15</h4>
+              <p><strong>Voters:</strong> <span id="registeredVoters15"></span></p>
+              <p><strong>Turnout:</strong> <span id="voterTurnout15"></span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Election Results -->
+        <div class="results-section">
+          <h2>🏆 Election Results</h2>
+          <div class="election-tabs">
+            <button class="tab-btn active" data-election="14">GE 14</button>
+            <button class="tab-btn" data-election="15">GE 15</button>
+          </div>
+          <div class="election-content">
+            <div class="election-chart active" id="chart-container-14">
+              <canvas id="electionChart14"></canvas>
+            </div>
+            <div class="election-chart" id="chart-container-15">
+              <canvas id="electionChart15"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Demographics -->
+        <div class="demographics-section">
+          <h2>👥 Voter Demographics</h2>
+          <div class="demo-grid">
+            <div class="demo-card">
+              <h4>Gender Split</h4>
+              <canvas id="genderChart"></canvas>
+            </div>
+            <div class="demo-card">
+              <h4>Ethnicity</h4>
+              <canvas id="ethnicityChart"></canvas>
+            </div>
+            <div class="demo-card">
+              <h4>Age Groups</h4>
+              <canvas id="ageChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="dashboard-right">
+        <!-- Map Section -->
+        <div class="map-section">
+          <h2>🗺️ Constituency Map</h2>
+          <div id="map-container"></div>
+        </div>
+
+        <!-- Statistics Table -->
+        <div class="table-section">
+          <h2>📈 Detailed Statistics</h2>
+          <div id="statsTableContainer">
+            <table id="statsTable">
+              <thead>
+                <tr>
+                  <th>Statistic</th>
+                  <th>GE14</th>
+                  <th>GE15</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <script src="/static/script.js"></script>
 
-  </header>
+    <script>
+      // Tab functionality for election results
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const chartContainers = document.querySelectorAll('.election-chart');
 
-  <main>
-    <section>
-      <h2>Election Results</h2>
-      <div class="chart-row" style="display: flex; flex-wrap: wrap; justify-content: space-around; align-items: flex-start;">
-        <div style="flex: 1; text-align: center;">
-          <h4>Election GE 14</h4>
-          <canvas id="electionChart14" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
-        </div>
-        <div style="flex: 1; text-align: center;">
-          <h4>Election GE 15</h4>
-          <canvas id="electionChart15" style="width: 100%; max-width: 600px; height: 300px;"></canvas>
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const election = this.dataset.election;
+
+            // Remove active class from all tabs and charts
+            tabBtns.forEach(tab => tab.classList.remove('active'));
+            chartContainers.forEach(chart => chart.classList.remove('active'));
+
+            // Add active class to clicked tab and corresponding chart
+            this.classList.add('active');
+            document.getElementById(`chart-container-${election}`).classList.add('active');
+          });
+        });
+
+        // Initialize MP initials from name
+        const mpNameElement = document.getElementById('mpName');
+        const mpInitialsElement = document.getElementById('mpInitials');
+
+        // Observer to update initials when name changes
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' || mutation.type === 'characterData') {
+              const name = mpNameElement.textContent.trim();
+              if (name && name !== 'Loading MP...') {
+                const initials = name.split(' ')
+                  .map(word => word.charAt(0))
+                  .join('')
+                  .substring(0, 2)
+                  .toUpperCase();
+                mpInitialsElement.textContent = initials;
+              }
+            }
+          });
+        });
+
+        observer.observe(mpNameElement, {
+          childList: true,
+          subtree: true,
+          characterData: true
+        });
+      });
+    </script>
+
+  <!-- MP Profile Modal -->
+   <div class="modal fade" id="mpProfileModal" tabindex="-1" aria-labelledby="mpProfileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mpProfileModalLabel">MP Profile</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="mpProfileContent">
+            <!-- Your existing modal content will be populated by your JavaScript -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
         </div>
       </div>
-      <div>
+    </div>
+  
+  <!-- MP Analysis Modal -->
+<div class="modal fade" id="mpAnalysisModal" tabindex="-1" aria-labelledby="mpAnalysisModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mpAnalysisModalLabel">MP Analysis</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="voter-boxes">
-        <div class="voter-card">
-          <h3>GE14</h3>
-          <p><strong>Registered Voters:</strong> <span id="registeredVoters14"></span></p>
-          <p><strong>Turnout:</strong> <span id="voterTurnout14"></span></p>
+      <div class="modal-body">
+        
+        <!-- Sentimen x Overtime -->
+        <div id="sentimentTimeSection" style="display:none; padding:10px;">
+            <label for="groupBySelect"><b>Group by:</b></label>
+            <select id="groupBySelect">
+                <option value="month">Month</option>
+                <option value="year">Year</option>
+            </select>
+            <canvas id="sentimentTimeChart" style="max-height:400px; margin-top:10px;"></canvas>
         </div>
-        <div class="voter-card">
-          <h3>GE15</h3>
-          <p><strong>Registered Voters:</strong> <span id="registeredVoters15"></span></p>
-          <p><strong>Turnout:</strong> <span id="voterTurnout15"></span></p>
-        </div>
-      </div>
-    </section>
-    <section>
-      <h2>Detailed Election Statistics</h2>
-      <div id="statsTableContainer" style="overflow-x:auto;">
-        <table id="statsTable" style="width:100%; border-collapse: collapse; font-family: sans-serif; margin-top: 10px;">
-          <thead>
-            <tr style="background-color: #f4f4f4;">
-              <th style="border: 1px solid #ccc; padding: 10px;">Statistic</th>
-              <th style="border: 1px solid #ccc; padding: 10px;">GE14</th>
-              <th style="border: 1px solid #ccc; padding: 10px;">GE15</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-    <section>
-      <h2>Demographics of Kubang Pasu Voters</h2>
-      <div class="chart-row" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem;">
-        <div><h4>Gender</h4><canvas id="genderChart" style="max-width: 300px;"></canvas></div>
-        <div><h4>Ethnicity</h4><canvas id="ethnicityChart" style="max-width: 300px;"></canvas></div>
-        <div>
-          <h4>Age</h4><canvas id="ageChart" style="max-width: 300px;"></canvas>
-        </div>
-      </div>
-    </section>
 
-    <section>
-      <h2>Map</h2>
-      <div id="map-container" style="height: 400px;"></div>
-    </section>
-  </main>
-
-  <script src="/static/script.js"></script>
-
-<!-- MP Profile Modal -->
- <div class="modal fade" id="mpProfileModal" tabindex="-1" aria-labelledby="mpProfileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="mpProfileModalLabel">MP Profile</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div id="mpProfileContent">Loading...</div>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
+</div>
 
-
-</body>
-</html>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96d571a045a4fdfe',t:'MTc1NDg5MTMwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </html>
