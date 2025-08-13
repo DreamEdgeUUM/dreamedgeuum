@@ -14,7 +14,8 @@ After download this file, you need to put it in the directory which you need to 
 For example, you keep this file (DreamEdge) in your Documents path, so the path will be like this: C:\Users\Documents\EdgeDream.
 
 Then, open CMD run as administrator.
-in CMD command this:
+in CMD,command this:
+
 cd <<your path of the directory contains this project's file>>
 
 After the command, it will lead to the location of the file then prompt this:
